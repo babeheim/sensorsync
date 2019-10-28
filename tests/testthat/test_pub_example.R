@@ -17,13 +17,13 @@ test_that("sync works with no offset", {
       seconds_offset = candidate_drift_correction
     )
   )
-  expect_equal(nrow(out), 4560)
+  expect_equal(nrow(out), 4559)
   expect_equal(min(out$unix_time), 1435957259)
   expect_equal(max(out$unix_time), 1436025629)
   expect_true(abs(mean(out$speed_m_s, na.rm = TRUE) - 0.0884) < 1e-4)
   expect_true(abs(var(out$speed_m_s, na.rm = TRUE) - 0.0528) < 1e-4)
-  expect_true(abs(mean(out$meters_in_segment, na.rm = TRUE) - 1.3256) < 1e-4)
-  expect_true(abs(var(out$meters_in_segment, na.rm = TRUE) - 11.8884) < 1e-4)
+  expect_true(abs(mean(out$meters_in_segment, na.rm = TRUE) - 1.3259) < 1e-4)
+  expect_true(abs(var(out$meters_in_segment, na.rm = TRUE) - 11.8907) < 1e-4)
   expect_true(
     all(
       (out$adjusted_unixtime - out$unix_time) == candidate_drift_correction
@@ -41,11 +41,11 @@ test_that("sync works with an offset of 10", {
       seconds_offset = candidate_drift_correction
     )
   )
-  expect_equal(nrow(out), 4559)
+  expect_equal(nrow(out), 4558)
   expect_true(abs(mean(out$speed_m_s, na.rm = TRUE) - 0.0884) < 1e-4)
   expect_true(abs(var(out$speed_m_s, na.rm = TRUE) - 0.0527) < 1e-4)
-  expect_true(abs(mean(out$meters_in_segment, na.rm = TRUE) - 1.3259) < 1e-4)
-  expect_true(abs(var(out$meters_in_segment, na.rm = TRUE) - 11.8570) < 1e-4)
+  expect_true(abs(mean(out$meters_in_segment, na.rm = TRUE) - 1.3261) < 1e-4)
+  expect_true(abs(var(out$meters_in_segment, na.rm = TRUE) - 11.8593) < 1e-4)
   expect_true(
     all(
       (out$adjusted_unixtime - out$unix_time) == candidate_drift_correction
@@ -63,11 +63,11 @@ test_that("sync works with an offset of -10", {
       seconds_offset = candidate_drift_correction
     )
   )
-  expect_equal(nrow(out), 4559)
+  expect_equal(nrow(out), 4558)
   expect_true(abs(mean(out$speed_m_s, na.rm = TRUE) - 0.0884) < 1e-4)
   expect_true(abs(var(out$speed_m_s, na.rm = TRUE) - 0.0521) < 1e-4)
-  expect_true(abs(mean(out$meters_in_segment, na.rm = TRUE) - 1.3259) < 1e-4)
-  expect_true(abs(var(out$meters_in_segment, na.rm = TRUE) - 11.7243) < 1e-4)
+  expect_true(abs(mean(out$meters_in_segment, na.rm = TRUE) - 1.3261) < 1e-4)
+  expect_true(abs(var(out$meters_in_segment, na.rm = TRUE) - 11.7266) < 1e-4)
   expect_true(
     all(
       (out$adjusted_unixtime - out$unix_time) == candidate_drift_correction

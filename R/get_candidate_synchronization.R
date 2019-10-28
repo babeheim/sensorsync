@@ -47,10 +47,15 @@ get_candidate_synchronization <- function(gps_data_file, accel_data_file, second
   min_gps_time <- min(gps$unix_time)
   max_gps_time <- max(gps$unix_time)
 
-  #this drops all accelerometer segments that
-  #begin before the first gps point and after the last one
-  overlap_entries <- (accel$adjusted_unix_time >= min(gps$unix_time) &
-    accel$adjusted_unix_time <= max(gps$unix_time))
+  # this drops all accelerometer segments that lie
+  # partially or completely outside gps boundaries
+  if (complete_gps_overlap) {
+    overlap_entries <- which(min(gps$unix_time) <= accel$adjusted_unix_time &
+      accel$adjusted_end_time <= max(gps$unix_time))
+  } else {
+    overlap_entries <- which(min(gps$unix_time) <= accel$adjusted_end_time &
+      accel$adjusted_unix_time <= max(gps$unix_time))
+  }
 
   accel <- accel[overlap_entries, ]
 
