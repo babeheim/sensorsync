@@ -41,20 +41,28 @@ get_candidate_synchronization <- function(gps_data_file, accel_data_file, second
   }
 
   # we should also rescale based on the estimated drift in microseconds per second
-  accel$adjusted_unix_time <- accel$segment_start_time + seconds_offset
+  accel$adjusted_start_time <- accel$segment_start_time + seconds_offset
   accel$adjusted_end_time <- accel$segment_end_time + seconds_offset
 
   min_gps_time <- min(gps$unix_time)
   max_gps_time <- max(gps$unix_time)
 
+  first_segment_start_time <- min(accel$adjusted_start_time)
+  last_segment_start_time <- max(accel$adjusted_start_time)
+  last_segment_end_time <- last_segment_start_time + epoch_length
+  # this is a guess, since the end times are not explicitly recorded
+
   # this drops all accelerometer segments that lie
   # partially or completely outside gps boundaries
+
   if (complete_gps_overlap) {
-    overlap_entries <- which(min(gps$unix_time) <= accel$adjusted_unix_time &
+    # only accept accelerometer segments completely bounded between gps points
+    overlap_entries <- which(min(gps$unix_time) <= accel$adjusted_start_time &
       accel$adjusted_end_time <= max(gps$unix_time))
   } else {
+    # accept accelerometer segments containing gps points but not bounded between them
     overlap_entries <- which(min(gps$unix_time) <= accel$adjusted_end_time &
-      accel$adjusted_unix_time <= max(gps$unix_time))
+      accel$adjusted_start_time <= max(gps$unix_time))
   }
 
   accel <- accel[overlap_entries, ]
@@ -64,8 +72,12 @@ get_candidate_synchronization <- function(gps_data_file, accel_data_file, second
   #accelerometer epoch (starting) unix_time values,
   #and thereafter, use these injected times as segment start times,
   #by which to summarize how far the subject traveled in each segment
-
-  gps_times_and_segment_start_times <- sort(unique(c(gps$unix_time, accel$adjusted_unix_time)))
+  
+  if (complete_gps_overlap) {
+    gps_times_and_segment_start_times <- sort(unique(c(gps$unix_time, accel$adjusted_start_time)))
+  } else {
+    gps_times_and_segment_start_times <- sort(unique(c(gps$unix_time, accel$adjusted_start_time, accel$adjusted_end_time)))
+  }
 
   #we now get interpolated trackpoints at the segment start times and the original trackpoints
   lat_interpolated <- approx(x=gps$unix_time, y=gps$lat, xout=gps_times_and_segment_start_times, rule=1, method="linear")$y
@@ -82,15 +94,10 @@ get_candidate_synchronization <- function(gps_data_file, accel_data_file, second
   )
 
   # associate each timestamp with an accelerometer segment
-  all_points$is_segment_start <- all_points$unix_time %in% accel$adjusted_unix_time
+  all_points$is_segment_start <- all_points$unix_time %in% accel$adjusted_start_time
   all_points$segment_number <- cumsum(all_points$is_segment_start)
 
-  # trim out stray gps data before first (adjusted) accelerometer segment times
-  first_segment_start_time <- min(accel$adjusted_unix_time)
-  last_segment_start_time <- max(accel$adjusted_unix_time)
-  last_segment_end_time <- last_segment_start_time + epoch_length
-  # this is a guess, since the end times are not explicitly recorded
-
+  # trim out gps data before first (adjusted) accelerometer segment times
   keep <- all_points$unix_time >= first_segment_start_time &
     all_points$unix_time < last_segment_end_time
   trimmed_points <- all_points[keep, ]
@@ -101,7 +108,8 @@ get_candidate_synchronization <- function(gps_data_file, accel_data_file, second
       segment_start_time = first(unix_time)) %>%
     as.data.frame()
 
-  accel <- merge(x=accel, y=tps_sum, by.x=("adjusted_unix_time"), by.y=("segment_start_time"), all.x=TRUE) 
+  accel <- merge(x=accel, y=tps_sum, by.x=("adjusted_start_time"), by.y=("segment_start_time"), all.x=TRUE)
+  accel <- rename(accel, adjusted_unix_time = adjusted_start_time)
   accel$speed_m_s <- accel$meters_in_segment/accel$time_to_next_segment
 
   return(accel)
