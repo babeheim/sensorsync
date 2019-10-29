@@ -1,12 +1,15 @@
 Package: sensorsync
-Title: What the Package Does (One Line, Title Case)
+Title: syncronization of accelerometer and GPS data with optimal corrections for time drift
 Version: 0.0.0.9000
-Authors@R: 
-    person(given = "First",
-           family = "Last",
+Authors@R: c(
+    person(given = "Brian",
+           family = "Wood",
            role = c("aut", "cre"),
-           email = "first.last@example.com",
-           comment = c(ORCID = "YOUR-ORCID-ID"))
+           email = "brianwood1@gmail.com"),
+    person(given = "Bret",
+           family = "Beheim",
+           role = c("aut"),
+           email = "beheim@gmail.com"))
 Description: What the package does (one paragraph).
 Depends: R (>= 3.5.1),
   geosphere,
