@@ -18,7 +18,7 @@ test_that("sync works with no offset", {
   expect_true(abs(var(out$meters_in_segment, na.rm = TRUE) - 11.8907) < 1e-4)
   expect_true(
     all(
-      (out$adjusted_unixtime - out$unix_time) == candidate_drift_correction
+      (out$adjusted_unix_time - out$unix_time) == candidate_drift_correction
     )
   )
   expect_identical(out$segment_number, 1:nrow(out))
@@ -40,7 +40,7 @@ test_that("sync works with an offset of 10", {
   expect_true(abs(var(out$meters_in_segment, na.rm = TRUE) - 11.8593) < 1e-4)
   expect_true(
     all(
-      (out$adjusted_unixtime - out$unix_time) == candidate_drift_correction
+      (out$adjusted_unix_time - out$unix_time) == candidate_drift_correction
     )
   )
   expect_identical(out$segment_number, 1:nrow(out))
@@ -62,12 +62,11 @@ test_that("sync works with an offset of -10", {
   expect_true(abs(var(out$meters_in_segment, na.rm = TRUE) - 11.7266) < 1e-4)
   expect_true(
     all(
-      (out$adjusted_unixtime - out$unix_time) == candidate_drift_correction
+      (out$adjusted_unix_time - out$unix_time) == candidate_drift_correction
     )
   )
   expect_identical(out$segment_number, 1:nrow(out))
 })
-
 
 test_that("sync works with a variety of offsets", {
   candidate_drift_correction <- seq(from = 30, to = 50, by = 1)
@@ -81,7 +80,7 @@ test_that("sync works with a variety of offsets", {
     )
     expect_true(
       all(
-        (out$adjusted_unixtime - out$unix_time) == candidate_drift_correction[i]
+        (out$adjusted_unix_time - out$unix_time) == candidate_drift_correction[i]
       )
     )
   }
