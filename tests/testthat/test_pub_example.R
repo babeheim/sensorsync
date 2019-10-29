@@ -1,19 +1,11 @@
 
-#in this example script, we load gps data and accelerometer data from the same subject on the same day,
-#then identify the optimal time drift correction for these data. After doing so, we plot the effects of time drift correction
-#and then save an optimally synchronized data set.
-
-# to test:
-# no overlap entries between two input files
-# e.g.   overlap_entries <- (accel$adjusted_unixtime >= min(gps$unix_time) &
-#   accel$adjusted_unixtime <= max(gps$unix_time))
 
 test_that("sync works with no offset", {
   candidate_drift_correction <- 0
+  accel <- read.csv("pub_example/example_accel_data.csv", stringsAsFactors = FALSE)
+  gps <- read.csv("pub_example/example_gps_data.csv", stringsAsFactors = FALSE)
   expect_warning(
-    out <- get_candidate_synchronization(
-      gps_data = "pub_example/example_gps_data.csv",
-      accel = "pub_example/example_accel_data.csv",
+    out <- get_candidate_synchronization(gps = gps, accel = accel,
       seconds_offset = candidate_drift_correction
     )
   )
@@ -34,10 +26,10 @@ test_that("sync works with no offset", {
 
 test_that("sync works with an offset of 10", {
   candidate_drift_correction <- 10
+  accel <- read.csv("pub_example/example_accel_data.csv", stringsAsFactors = FALSE)
+  gps <- read.csv("pub_example/example_gps_data.csv", stringsAsFactors = FALSE)
   expect_warning(
-    out <- get_candidate_synchronization(
-      gps_data = "pub_example/example_gps_data.csv",
-      accel = "pub_example/example_accel_data.csv",
+    out <- get_candidate_synchronization(gps = gps, accel = accel,
       seconds_offset = candidate_drift_correction
     )
   )
@@ -56,10 +48,10 @@ test_that("sync works with an offset of 10", {
 
 test_that("sync works with an offset of -10", {
   candidate_drift_correction <- (-10)
+  accel <- read.csv("pub_example/example_accel_data.csv", stringsAsFactors = FALSE)
+  gps <- read.csv("pub_example/example_gps_data.csv", stringsAsFactors = FALSE)
   expect_warning(
-    out <- get_candidate_synchronization(
-      gps_data = "pub_example/example_gps_data.csv",
-      accel = "pub_example/example_accel_data.csv",
+    out <- get_candidate_synchronization(gps = gps, accel = accel,
       seconds_offset = candidate_drift_correction
     )
   )
@@ -76,13 +68,14 @@ test_that("sync works with an offset of -10", {
   expect_identical(out$segment_number, 1:nrow(out))
 })
 
+
 test_that("sync works with a variety of offsets", {
   candidate_drift_correction <- seq(from = 30, to = 50, by = 1)
+  accel <- read.csv("pub_example/example_accel_data.csv", stringsAsFactors = FALSE)
+  gps <- read.csv("pub_example/example_gps_data.csv", stringsAsFactors = FALSE)
   for (i in 1:length(candidate_drift_correction)) {
     expect_warning(
-      out <- get_candidate_synchronization(
-        gps_data = "pub_example/example_gps_data.csv",
-        accel = "pub_example/example_accel_data.csv",
+      out <- get_candidate_synchronization(gps = gps, accel = accel,
         seconds_offset = candidate_drift_correction[i]
       )
     )
